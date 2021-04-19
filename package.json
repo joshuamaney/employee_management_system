@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/joshuamaney/employee_management_system#readme",
   "dependencies": {
+    "inquirer": "^8.0.0",
     "mysql": "^2.18.1"
   }
 }
