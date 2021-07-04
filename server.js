@@ -24,22 +24,57 @@ connection.connect((err) => {
 });
 
 const start = () => {
-  inquirer.prompt({
-    type: "list",
-    message: "What would you like to do?",
-    name: "choice",
-    choices: [
-      "View Roles",
-      "View Departments",
-      "View Employees",
-      "View Employees by Manager",
-      "Update Employee Manager",
-      "Update Employee Role",
-      "Add Role",
-      "Add Department",
-      "Add Employee",
-      "Cancel and Exit",
-    ],
-  });
+  inquirer
+    .prompt({
+      type: "list",
+      message: "What would you like to do?",
+      name: "choice",
+      choices: [
+        "View Roles",
+        "View Departments",
+        "View Employees",
+        "View Employees by Manager",
+        "Update Employee Manager",
+        "Update Employee Role",
+        "Add Role",
+        "Add Department",
+        "Add Employee",
+        "Cancel and Exit",
+      ],
+    })
+    .then((res) => {
+      switch (res.choice) {
+        case "View Roles":
+            viewRoles();
+            break;
+        case "View Departments":
+            viewDepartments();
+            break;
+        case "View Employees":
+            viewEmployees();
+              break;
+          case "View Employees by Manager":
+              viewEmployeesbyManager();
+              break;
+          case "Update Employee Manager":
+              updateEmployeeManager();
+              break;
+          case "Update Employee Role":
+              updateEmployeeRole();
+              break;
+          case "Add Role":
+              addRole();
+              break;
+          case "Add Department":
+              addDepartment();
+              break;
+          case "Add Employee":
+              addEmployee();
+              break;
+          default:
+              connection.end();
+              break;
+      }
+    });
 };
 
