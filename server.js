@@ -4,17 +4,17 @@ require('dotenv').config()
 require('console.table')
 
 const connection = mysql.createConnection({
-    host: 'localhost',
+  host: "localhost",
 
-    // Your port; if not 3306
-    port: process.env.PORT || 3306,
+  // Your port; if not 3306
+  port: process.env.PORT || 3306,
 
-    // Your username
-    user: 'root',
+  // Your username
+  user: "root",
 
-    // Be sure to update with your own MySQL password!
-    password: '',
-    database: 'company_DB',
+  // Be sure to update with your own MySQL password!
+  password: "Anomalous0820",
+  database: "company_DB",
 });
 
 connection.connect((err) => {
