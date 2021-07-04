@@ -23,3 +23,23 @@ connection.connect((err) => {
     runApp();
 });
 
+const start = () => {
+  inquirer.prompt({
+    type: "list",
+    message: "What would you like to do?",
+    name: "choice",
+    choices: [
+      "View Roles",
+      "View Departments",
+      "View Employees",
+      "View Employees by Manager",
+      "Update Employee Manager",
+      "Update Employee Role",
+      "Add Role",
+      "Add Department",
+      "Add Employee",
+      "Cancel and Exit",
+    ],
+  });
+};
+
