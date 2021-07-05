@@ -1,13 +1,16 @@
 USE company_DB;
 
-INSERT INTO departments
-VALUES ("Deli"), ("Produce"), ("Bakery"), ("Cashier");
+INSERT INTO department (name)
+VALUES ("Editor in Chief"), ("Journalist"), ("Reporter"), ("Intern");
 
-INSERT INTO roles
-VALUES ("Manager", 100000, 1), ("Associate", 50000, 2), ("Cashier", 25000, 3);
+INSERT INTO jobs (title, salary, department_id)
+VALUES ("Manager", 100000, 1), ("Associate", 50000, 2), ("Internship", 25000, 3);
 
-INSERT INTO employees
-VALUES ("John", "Doe", 1, null);
+INSERT INTO employee (first_name, last_name, jobs_id, manager_id)
+VALUES ("Perry", "White", 1, null);
 
-INSERT INTO employees
-VALUES ("Clark", "Kent", 2, 1),("Lex", "Luther", 3, 1);
+INSERT INTO employee (first_name, last_name, jobs_id, manager_id)
+VALUES ("Clark", "Kent", 2, 1);
+
+INSERT INTO employee (first_name, last_name, jobs_id, manager_id)
+VALUES ("Lois", "Lane", 2, 1);

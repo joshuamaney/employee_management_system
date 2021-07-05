@@ -2,31 +2,31 @@ DROP DATABASE IF EXISTS company_DB;
 CREATE DATABASE company_DB;
 USE company_DB;
 
-CREATE TABLE departments (
+CREATE TABLE department (
     id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(30) NOT NULL,
     PRIMARY KEY (id)    
 );
-CREATE TABLE roles (
+CREATE TABLE jobs (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(30) NOT NULL,
     salary DECIMAL(10,2),
-    department_id INT,
+    department_id INT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (department_id) REFERENCES departments(id)
+    FOREIGN KEY (department_id) REFERENCES department(id)
 );
-CREATE TABLE employees (
+CREATE TABLE employee (
     id INT NOT NULL AUTO_INCREMENT,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
-    role_id INT,
-    manager_id INT,
+    jobs_id INT NOT NULL,
+    manager_id INT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (role_id) REFERENCES roles(id),
-    FOREIGN KEY (manager_id) REFERENCES employees(id)
+    FOREIGN KEY (jobs_id) REFERENCES jobs(id),
+    FOREIGN KEY (manager_id) REFERENCES employee(id)
 );
 
 
-SELECT * FROM departments;
-SELECT * FROM roles;
-SELECT * FROM employees;
+SELECT * FROM department;
+SELECT * FROM jobs;
+SELECT * FROM employee;
