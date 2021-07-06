@@ -1,7 +1,7 @@
 const inquirer = require('inquirer')
 const mysql = require('mysql');
 require('dotenv').config()
-const consoleTable = require("console.table");
+const cTable = require("console.table");
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -88,7 +88,7 @@ const viewDepartments = () => {
 
 const viewEmployees = () => {
   connection.query(
-    "SELECT T1.id AS ID, CONCAT(T1.first_name, ' ', T1.last_name) AS Name, CONCAT(T2.first_name, ' ', T2.last_name) AS 'Reports To', jobs.title AS 'Job Title', jobs.salary AS Salary, department.name AS Department FROM employee T1 LEFT JOIN jobs ON (T1.jobs_id = jobs.id) LEFT JOIN department ON (jobs.department_id = department.id) LEFT JOIN employee T2 ON (T1.manager_id = T2.id)",
+    "SELECT T1.id AS ID, concat(T1.first_name, ' ', T1.last_name) AS Name, concat(T2.first_name, ' ', T2.last_name) AS 'Reports To', jobs.title AS 'Job Title', jobs.salary AS Salary, department.name AS Department FROM employee T1 LEFT JOIN jobs ON (T1.jobs_id = jobs.id) LEFT JOIN department ON (jobs.department_id = department.id) LEFT JOIN employee T2 ON (T1.manager_id = T2.id)",
     (err, res) => {
       if (err) throw err;
       console.table("\nEMPLOYEES", res);
@@ -97,71 +97,163 @@ const viewEmployees = () => {
   );
 };
 
-const updateEmployeeJob = () => {
-  connection.query(
-    "SELECT first_name, last_name, id FROM employee",
-    (err, res) => {
-      if (err) throw err;
+const addJob = () => {
+    connection.query(
+        "SELECT name, id FROM department", (err, res) => {
+            if (err) throw err;
+            let departArray = [];
+            for (let i = 0; i < res.length; i++) {
+                let department = res[i]
+                let departObj = {
+                    name: department.name,
+                    value: department.id
+                }
+                departArray.push(departObj);
+            };
 
-      let employeesArray = [];
-      for (let i = 0; i < res.length; i++) {
-        let empName = `${res[i].first_name} ${res[i].last_name}`;
-        let empId = res[i].id;
-        let empNameObject = {
-          name: empName,
-          value: empId,
-        };
-        employeesArray.push(empNameObject);
-      }
-
-      connection.query("SELECT title, id FROM job", (err, res) => {
-        if (err) throw err;
-
-        let jobsArray = [];
-        for (let i = 0; i < res.length; i++) {
-          let jobTitle = res[i].title;
-          let jobId = res[i].id;
-          let jobNameObject = {
-            name: jobTitle,
-            value: jobId,
-          };
-          jobsArray.push(jobNameObject);
+            inquirer
+                .prompt([
+                    {
+                        type: "input",
+                        message: "What is the job to be added?",
+                        name: "title"
+                    },
+                    {
+                        type: "input",
+                        message: "What is the annual salary?",
+                        name: "salary"
+                    },
+                    {
+                        type: "list",
+                        message: "What is the department ID for the job?",
+                        name: "department",
+                        choices: departArray
+                    }
+                ])
+                .then((response) => {
+                    connection.query(
+                        "INSERT INTO jobs SET ?",
+                        {
+                            title: response.title,
+                            salary: response.salary,
+                            department_id: response.department
+                        },
+                        (err, res) => {
+                            if (err) throw err;
+                            console.log("\nJob added successfully!\n");
+                            runApp();
+                        })
+                })
         }
-
-        inquirer
-          .prompt([
-            {
-              type: "list",
-              message: "Which employee would you like to update?",
-              name: "name",
-              choices: employeesArray,
-            },
-            {
-              type: "list",
-              message: "What is the employee's new job title?",
-              name: "jobTitle",
-              choices: jobsArray,
-            },
-          ])
-          .then((response) => {
-            connection.query(
-              "UPDATE employee SET ? WHERE ?",
-              [
-                {
-                  job_id: response.jobTitle,
-                },
-                {
-                  id: response.name,
-                },
-              ],
-              (err, res) => {
-                if (err) throw err;
-                console.log("Job update successful!");
-                start();
-              }
-            );
-          });
-      });
-    }
-  );
+    );
 };
+
+const addDepartment = () => {
+    inquirer
+        .prompt(
+            {
+                type: "input",
+                message: "What is new department?",
+                name: "deptName"
+            }
+        )
+        .then((response) => {
+            connection.query(
+                "INSERT INTO department SET ?",
+                {
+                    name: response.deptName
+                },
+                (err) => {
+                    if (err) throw err;
+                    console.log(`\nDepartment ${response.deptName} successfully added\n`);
+                    runApp();
+                }
+            );
+        })
+};
+
+const addEmployee = () => {
+    connection.query('SELECT * FROM jobs', function (err, res) {
+        if (err) throw err;
+        inquirer
+            .prompt([
+                {
+                    name: 'first_name',
+                    type: 'input',
+                    message: "What is the employee's fist name? ",
+                },
+                {
+                    name: 'last_name',
+                    type: 'input',
+                    message: "What is the employee's last name? "
+                },
+                {
+                    name: 'manager_id',
+                    type: 'input',
+                    message: "What is the employee's manager's ID? "
+                },
+                {
+                    name: 'jobs',
+                    type: 'list',
+                    choices: function () {
+                        var jobsArray = [];
+                        for (let i = 0; i < res.length; i++) {
+                            jobsArray.push(res[i].title);
+                        }
+                        return jobsArray;
+                    },
+                    message: "What is this employee's job? "
+                }
+            ]).then(function (answer) {
+                let jobs_id;
+                for (let a = 0; a < res.length; a++) {
+                    if (res[a].title == answer.jobs) {
+                        jobs_id = res[a].id;
+                        console.log(jobs_id)
+                    }
+                }
+                connection.query(
+                    'INSERT INTO employee SET ?',
+                    {
+                        first_name: answer.first_name,
+                        last_name: answer.last_name,
+                        manager_id: answer.manager_id,
+                        jobs_id: jobs_id,
+                    },
+                    function (err) {
+                        if (err) throw err;
+                        console.log('Your employee has been added!');
+                        runApp();
+                    })
+            })
+    })
+};
+
+const updateEmployeeJob = () => {
+    inquirer
+        .prompt({
+            name: "id",
+            type: "input",
+            message: "Enter employee id",
+        })
+        .then(function (answer) {
+            var id = answer.id;
+
+            inquirer
+                .prompt({
+                    name: "jobsId",
+                    type: "input",
+                    message: "Enter employee id",
+                })
+                .then(function (answer) {
+                    var employeeId = answer.employeeId;
+
+                    var query = "UPDATE employee SET jobs_id=? WHERE id=?";
+                    connection.query(query, [employeeId, id], function (err, res) {
+                        if (err) {
+                        }
+                        runApp();
+                    });
+                });
+        });
+}
